@@ -53,6 +53,18 @@ impl<T: Copy + PartialOrd + Unsigned> Rect<T> {
             cur_coord: self.min_coord
         }
     }
+
+    pub fn subrect_iter<'s, S>(&self, subrect: Rect<T>, data: &'s [S])
+                               -> DataRectIter<'s, S, T> {
+        // TODO(nicholasbishop): validate subrect
+        DataRectIter {
+            data: data,
+            cur_elem: data.as_ptr(),
+            cur_coord: subrect.min_coord,
+            full: *self,
+            part: subrect
+        }
+    }
 }
 
 pub struct RectIter<T: Copy + Unsigned> {
@@ -87,4 +99,23 @@ fn test_rect_iter() {
         Coord::new(1, 2), Coord::new(2, 2), Coord::new(3, 2),
         Coord::new(1, 3), Coord::new(2, 3), Coord::new(3, 3),
         Coord::new(1, 4), Coord::new(2, 4), Coord::new(3, 4)]);
+}
+
+pub struct DataRectIter<'s, S: 's, T: Copy + Unsigned> {
+    data: &'s [S],
+    cur_elem: *const S,
+    cur_coord: Coord<T>,
+    full: Rect<T>,
+    part: Rect<T>
+}
+
+impl<'s, S: 's, T: Copy + Unsigned> Iterator for DataRectIter<'s, S, T> {
+    type Item = (Coord<T>, &'s S);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        unsafe {
+            self.cur_elem = self.cur_elem.offset(1);
+        }
+        None
+    }
 }
