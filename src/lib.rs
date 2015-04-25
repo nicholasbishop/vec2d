@@ -1,11 +1,11 @@
-/// 2D grid coordinate
+/// 2D coordinate
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Coord {
     pub x: usize,
     pub y: usize
 }
 
-/// 2D grid dimensions
+/// 2D dimensions
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Size {
     pub width: usize,
@@ -13,7 +13,7 @@ pub struct Size {
 }
 
 impl Coord {
-    /// Create a grid coordinate at (x, y)
+    /// Create a coordinate at (x, y)
     pub fn new(x: usize, y: usize) -> Coord {
         Coord {
             x: x,
@@ -23,7 +23,7 @@ impl Coord {
 }
 
 impl Size {
-    /// Create a grid size of (width, height)
+    /// Create a 2D size of (width, height)
     pub fn new(width: usize, height: usize) -> Size {
         Size {
             width: width,
