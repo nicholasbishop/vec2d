@@ -208,6 +208,24 @@ mod test {
     }
 
     #[test]
+    fn test_rect() {
+        let rect = Rect::new(Coord::new(1, 2), Coord::new(5, 3)).unwrap();
+        assert_eq!(rect.width(), 5);
+        assert_eq!(rect.height(), 2);
+
+        assert_eq!(rect.width(), rect.size().width);
+        assert_eq!(rect.height(), rect.size().height);
+    }
+
+    #[test]
+    fn test_bad_rect() {
+        assert_eq!(Rect::new(Coord::new(2, 1), Coord::new(1, 1)).is_none(),
+                   true);
+        assert_eq!(Rect::new(Coord::new(1, 2), Coord::new(1, 1)).is_none(),
+                   true);
+    }
+
+    #[test]
     fn test_rect_iter_mut() {
         let elems = vec![1, 2, 3, 4];
         let mut grid = Vec2D::from_vec(Size::new(2, 2), elems).unwrap();
