@@ -168,6 +168,13 @@ mod test {
     use super::*;
 
     #[test]
+    fn test_coord() {
+        let coord = Coord::new(1, 2);
+        assert_eq!(coord.x, 1);
+        assert_eq!(coord.y, 2);
+    }
+
+    #[test]
     fn test_rect_iter_mut() {
         let elems = vec![1, 2, 3, 4];
         let mut grid = Vec2D::from_vec(Size::new(2, 2), elems).unwrap();
