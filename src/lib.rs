@@ -53,8 +53,19 @@ pub struct Rect {
 }
 
 impl Rect {
-    fn width(&self) -> usize {
+    /// Calculate rectangle width
+    pub fn width(&self) -> usize {
         return self.max_coord.x - self.min_coord.x + 1;
+    }
+
+    /// Calculate rectangle height
+    pub fn height(&self) -> usize {
+        return self.max_coord.y - self.min_coord.y + 1;
+    }
+
+    /// Calculate rectangle size
+    pub fn size(&self) -> Size {
+        Size::new(self.width(), self.height())
     }
 }
 
