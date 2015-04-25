@@ -5,11 +5,37 @@ pub struct Coord {
     pub y: usize
 }
 
-/// 2D dimensions
+/// Rectangle defined by inclusive minimum and maximum coordinates
+#[derive(Clone, Copy, Eq, Debug, PartialEq)]
+pub struct Rect {
+    /// Minimum coordinate (inclusive)
+    min_coord: Coord,
+
+    /// Maximum coordinate (inclusive)
+    max_coord: Coord
+}
+
+/// 2D dimension
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Size {
     pub width: usize,
     pub height: usize
+}
+
+/// Container for 2D data
+pub struct Vec2D<T> {
+    elems: Vec<T>,
+    size: Size
+}
+
+/// Mutable iterator over a Vec2D
+pub struct RectIterMut<'a, Elem: 'a> {
+    grid: std::marker::PhantomData<&'a mut Vec2D<Elem>>,
+
+    rect: Rect,
+    cur_elem: *mut Elem,
+    cur_coord: Coord,
+    stride: isize
 }
 
 impl Coord {
@@ -19,6 +45,23 @@ impl Coord {
             x: x,
             y: y
         }
+    }
+}
+
+impl Rect {
+    /// Calculate rectangle width
+    pub fn width(&self) -> usize {
+        return self.max_coord.x - self.min_coord.x + 1;
+    }
+
+    /// Calculate rectangle height
+    pub fn height(&self) -> usize {
+        return self.max_coord.y - self.min_coord.y + 1;
+    }
+
+    /// Calculate rectangle size
+    pub fn size(&self) -> Size {
+        Size::new(self.width(), self.height())
     }
 }
 
@@ -40,38 +83,6 @@ impl Size {
     pub fn contains_coord(&self, coord: Coord) -> bool {
         coord.x < self.width && coord.y < self.height
     }
-}
-
-/// Rectangle defined by inclusive minimum and maximum coordinates
-#[derive(Clone, Copy, Eq, Debug, PartialEq)]
-pub struct Rect {
-    /// Minimum coordinate (inclusive)
-    min_coord: Coord,
-
-    /// Maximum coordinate (inclusive)
-    max_coord: Coord
-}
-
-impl Rect {
-    /// Calculate rectangle width
-    pub fn width(&self) -> usize {
-        return self.max_coord.x - self.min_coord.x + 1;
-    }
-
-    /// Calculate rectangle height
-    pub fn height(&self) -> usize {
-        return self.max_coord.y - self.min_coord.y + 1;
-    }
-
-    /// Calculate rectangle size
-    pub fn size(&self) -> Size {
-        Size::new(self.width(), self.height())
-    }
-}
-
-pub struct Vec2D<T> {
-    elems: Vec<T>,
-    size: Size
 }
 
 impl<Elem: Copy> Vec2D<Elem> {
@@ -134,30 +145,6 @@ impl<'a, Elem> Iterator for RectIterMut<'a, Elem> {
     }
 }
 
-pub struct RectIterMut<'a, Elem: 'a> {
-    grid: std::marker::PhantomData<&'a mut Vec2D<Elem>>,
-
-    rect: Rect,
-    cur_elem: *mut Elem,
-    cur_coord: Coord,
-    stride: isize
-}
-
-#[test]
-fn test_rect_iter_mut() {
-    let elems = vec![1, 2, 3, 4];
-    let mut grid = Vec2D::from_vec(Size::new(2, 2), elems).unwrap();
-    let rect = Rect::new(Coord::new(0, 0), Coord::new(1, 1)).unwrap();
-
-    let mut actual_coords = Vec::new();
-    for (coord, elem) in grid.rect_iter_mut(rect).unwrap() {
-        *elem = -(*elem);
-        actual_coords.push((coord.x, coord.y));
-    }
-    assert_eq!(actual_coords, [(0, 0), (1, 0), (0, 1), (1, 1)]);
-    assert_eq!(grid.elems, [-1, -2, -3, -4]);
-}
-
 impl Rect {
     /// Create a new Rect defined by inclusive minimum and maximum
     /// coordinates. If min_coord is greater than max_coord on either
@@ -174,4 +161,19 @@ impl Rect {
         }
     }
 
+}
+
+#[test]
+fn test_rect_iter_mut() {
+    let elems = vec![1, 2, 3, 4];
+    let mut grid = Vec2D::from_vec(Size::new(2, 2), elems).unwrap();
+    let rect = Rect::new(Coord::new(0, 0), Coord::new(1, 1)).unwrap();
+
+    let mut actual_coords = Vec::new();
+    for (coord, elem) in grid.rect_iter_mut(rect).unwrap() {
+        *elem = -(*elem);
+        actual_coords.push((coord.x, coord.y));
+    }
+    assert_eq!(actual_coords, [(0, 0), (1, 0), (0, 1), (1, 1)]);
+    assert_eq!(grid.elems, [-1, -2, -3, -4]);
 }
