@@ -46,6 +46,7 @@ pub struct Size {
 }
 
 /// Container for 2D data
+#[derive(Clone, Debug)]
 pub struct Vec2D<T> {
     elems: Vec<T>,
     size: Size
