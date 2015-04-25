@@ -1,6 +1,8 @@
 [package]
 authors = ["Nicholas Bishop <nicholasbishop@gmail.com>"]
+description = "Very simple 2D container for storing rectangular data"
 license = "Apache-2.0"
 name = "vec2d"
 readme = "README.md"
+repository = "https://github.com/nicholasbishop/vec2d"
 version = "0.0.1"
