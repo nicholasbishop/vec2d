@@ -52,7 +52,17 @@ pub struct Vec2D<T> {
     size: Size
 }
 
-/// Mutable iterator over a Vec2D
+/// Iterator over a rectangle within a Vec2D
+pub struct RectIter<'a, Elem: 'a> {
+    grid: std::marker::PhantomData<&'a Vec2D<Elem>>,
+
+    rect: Rect,
+    cur_elem: *const Elem,
+    cur_coord: Coord,
+    stride: isize
+}
+
+/// Mutable iterator over a rectangle within a Vec2D
 pub struct RectIterMut<'a, Elem: 'a> {
     grid: std::marker::PhantomData<&'a mut Vec2D<Elem>>,
 
@@ -143,6 +153,28 @@ impl<Elem: Copy> Vec2D<Elem> {
         }
     }
 
+    fn stride(&self, rect: &Rect) -> isize {
+        (self.size.width + 1 - rect.width()) as isize
+    }
+
+    /// Create an iterator over a rectangular region of the
+    /// Vec2D. None is returned if the given `rect` does not fit
+    /// entirely within the Vec2D.
+    pub fn rect_iter<'a>(&'a self, rect: Rect) -> Option<RectIter<'a, Elem>> {
+        if self.size.contains_coord(rect.max_coord) {
+            Some(RectIter {
+                grid: std::marker::PhantomData,
+                stride: self.stride(&rect),
+                cur_elem: self.elems.as_ptr(),
+                rect: rect,
+                cur_coord: rect.min_coord
+            })
+        }
+        else {
+            None
+        }
+    }
+
     /// Create a mutable iterator over a rectangular region of the
     /// Vec2D. None is returned if the given `rect` does not fit
     /// entirely within the Vec2D.
@@ -150,11 +182,35 @@ impl<Elem: Copy> Vec2D<Elem> {
         if self.size.contains_coord(rect.max_coord) {
             Some(RectIterMut {
                 grid: std::marker::PhantomData,
-                stride: (self.size.width - rect.width() + 1) as isize,
+                stride: self.stride(&rect),
                 cur_elem: self.elems.as_mut_ptr(),
                 rect: rect,
                 cur_coord: rect.min_coord
             })
+        }
+        else {
+            None
+        }
+    }
+}
+
+impl<'a, Elem> Iterator for RectIter<'a, Elem> {
+    type Item = (Coord, &'a Elem);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.cur_coord.y <= self.rect.max_coord.y {
+            let result = (self.cur_coord, unsafe { & *self.cur_elem });
+
+            self.cur_coord.x += 1;
+            if self.cur_coord.x <= self.rect.max_coord.x {
+                unsafe { self.cur_elem = self.cur_elem.offset(1); }
+            }
+            else {
+                self.cur_coord.x = self.rect.min_coord.x;
+                self.cur_coord.y += 1;
+                unsafe { self.cur_elem = self.cur_elem.offset(self.stride); }
+            }
+            Some(result)
         }
         else {
             None
@@ -263,5 +319,19 @@ mod test {
         }
         assert_eq!(actual_coords, [(0, 0), (1, 0), (0, 1), (1, 1)]);
         assert_eq!(grid.elems, [-1, -2, -3, -4]);
+    }
+
+    #[test]
+    fn test_two_iterators() {
+        let size = Size::new(2, 1);
+        let v = Vec2D::from_vec(size, vec![0, 1]).unwrap();
+
+        let iter1 = v.rect_iter(size.rect()).unwrap();
+        let iter2 = v.rect_iter(size.rect()).unwrap();
+        
+        for ((coord1, elem1), (coord2, elem2)) in iter1.zip(iter2) {
+            assert_eq!(coord1, coord2);
+            assert_eq!(elem1, elem2);
+        }
     }
 }
