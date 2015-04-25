@@ -1,7 +1,28 @@
+// Copyright 2015 Nicholas Bishop
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+//! Vec2D is a very simple 2D container for storing rectangular data
+
+#![deny(missing_docs)]
+
 /// 2D coordinate
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Coord {
+    /// X component
     pub x: usize,
+
+    /// Y component
     pub y: usize
 }
 
@@ -15,10 +36,12 @@ pub struct Rect {
     max_coord: Coord
 }
 
-/// 2D dimension
+/// Rectangle dimensions
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Size {
+    /// Width of rectangle
     pub width: usize,
+    /// Height of rectangle
     pub height: usize
 }
 
@@ -74,6 +97,7 @@ impl Size {
         }
     }
 
+    /// width * height
     pub fn area(&self) -> usize {
         self.width * self.height
     }
@@ -86,6 +110,8 @@ impl Size {
 }
 
 impl<Elem: Copy> Vec2D<Elem> {
+    /// Create a Vec2D with the given `size`. All elements are
+    /// initialized as copies of the `example` element.
     pub fn from_example(size: Size, example: &Elem) -> Vec2D<Elem> {
         Vec2D {
             elems: vec![*example; size.area()],
@@ -93,6 +119,9 @@ impl<Elem: Copy> Vec2D<Elem> {
         }
     }
 
+    /// Create a Vec2D with the given `size`. The contents are set to
+    /// `src`. None is returned if the `size` does not match the
+    /// length of `src`.
     pub fn from_vec(size: Size, src: Vec<Elem>) -> Option<Vec2D<Elem>> {
         if size.area() == src.len() {
             Some(Vec2D {
@@ -105,6 +134,9 @@ impl<Elem: Copy> Vec2D<Elem> {
         }
     }
 
+    /// Create a mutable iterator over a rectangular region of the
+    /// Vec2D. None is returned if the given `rect` does not fit
+    /// entirely within the Vec2D.
     pub fn rect_iter_mut<'a>(&'a mut self, rect: Rect) -> Option<RectIterMut<'a, Elem>> {
         if self.size.contains_coord(rect.max_coord) {
             Some(RectIterMut {
