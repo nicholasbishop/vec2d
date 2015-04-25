@@ -164,17 +164,34 @@ impl<Elem: Copy> Vec2D<Elem> {
         (self.size.width + 1 - rect.width()) as isize
     }
 
+    /// Calculate pointer offset for `start` element.
+    fn start_offset(&self, start: Coord) -> isize {
+        debug_assert_eq!(self.size.contains_coord(start), true);
+        (start.y * self.size.width + start.x) as isize
+    }
+
     /// Create an iterator over a rectangular region of the
     /// Vec2D. None is returned if the given `rect` does not fit
     /// entirely within the Vec2D.
     pub fn rect_iter<'a>(&'a self, rect: Rect) -> Option<RectIter<'a, Elem>> {
-        if self.size.contains_coord(rect.max_coord) {
+        self.rect_iter_at(rect, rect.min_coord)
+    }
+
+    /// Create an iterator over a rectangular region of the Vec2D with
+    /// the `start` coord. None is returned if the given `rect` does
+    /// not fit entirely within the Vec2D or if the `start` coord is
+    /// not within `rect`.
+    pub fn rect_iter_at<'a>(&'a self, rect: Rect,
+                            start: Coord) -> Option<RectIter<'a, Elem>> {
+        if self.size.contains_coord(rect.max_coord) && rect.contains_coord(start) {
             Some(RectIter {
                 grid: std::marker::PhantomData,
                 stride: self.stride(&rect),
-                cur_elem: self.elems.as_ptr(),
+                cur_elem: unsafe {
+                    self.elems.as_ptr().offset(self.start_offset(start))
+                },
                 rect: rect,
-                cur_coord: rect.min_coord
+                cur_coord: start
             })
         }
         else {
@@ -343,5 +360,17 @@ mod test {
             assert_eq!(coord1, coord2);
             assert_eq!(elem1, elem2);
         }
+    }
+
+    #[test]
+    fn test_rect_iter_at() {
+        let size = Size::new(1, 2);
+        let v = Vec2D::from_vec(size, vec![0, 1]).unwrap();
+
+        let start = Coord::new(0, 1);
+        let mut iter = v.rect_iter_at(size.rect(), start).unwrap();
+        let (coord, elem) = iter.next().unwrap();
+        assert_eq!((coord, *elem), (start, 1));
+        assert_eq!(iter.next().is_none(), true);
     }
 }
