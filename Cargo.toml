@@ -1,4 +1,4 @@
 [package]
-name = "grid"
+name = "vec2d"
 version = "0.1.0"
 authors = ["Nicholas Bishop <nicholasbishop@gmail.com>"]
