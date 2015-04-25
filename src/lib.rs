@@ -133,7 +133,7 @@ pub struct RectIterMut<'a, Elem: 'a> {
 
 #[test]
 fn test_rect_iter_mut() {
-    let mut elems = vec![0, 1, 2, 3];
+    let elems = vec![0, 1, 2, 3];
     let mut grid = Vec2D::from_vec(Size::new(2, 2), elems).unwrap();
     let rect = Rect::new(Coord::new(0, 0), Coord::new(1, 1)).unwrap();
 
