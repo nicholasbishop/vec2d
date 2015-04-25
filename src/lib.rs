@@ -97,7 +97,7 @@ impl<Elem: Copy> Vec2D<Elem> {
     pub fn rect_iter_mut<'a>(&'a mut self, rect: Rect) -> Option<RectIterMut<'a, Elem>> {
         if self.size.contains_coord(rect.max_coord) {
             Some(RectIterMut {
-                stride: (self.size.width - rect.width()) as isize,
+                stride: (self.size.width - rect.width() + 1) as isize,
                 cur_elem: self.elems.as_mut_ptr(),
                 grid: self,
                 rect: rect,
@@ -119,12 +119,12 @@ impl<'a, Elem> Iterator for RectIterMut<'a, Elem> {
 
             self.cur_coord.x += 1;
             if self.cur_coord.x <= self.rect.max_coord.x {
-                unsafe { self.cur_elem.offset(1); }
+                unsafe { self.cur_elem = self.cur_elem.offset(1); }
             }
             else {
                 self.cur_coord.x = self.rect.min_coord.x;
                 self.cur_coord.y += 1;
-                unsafe { self.cur_elem.offset(self.stride); }
+                unsafe { self.cur_elem = self.cur_elem.offset(self.stride); }
             }
             Some(result)
         }
