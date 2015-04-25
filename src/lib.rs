@@ -108,6 +108,14 @@ impl Size {
     pub fn contains_coord(&self, coord: Coord) -> bool {
         coord.x < self.width && coord.y < self.height
     }
+
+    /// Create a rectangle starting at (0, 0) with `self`'s size.
+    pub fn rect(&self) -> Rect {
+        Rect {
+            min_coord: Coord::new(0, 0),
+            max_coord: Coord::new(self.width - 1, self.height - 1)
+        }
+    }
 }
 
 impl<Elem: Copy> Vec2D<Elem> {
@@ -236,6 +244,10 @@ mod test {
         assert_eq!(size.contains_coord(Coord::new(1, 1)), true);
         assert_eq!(size.contains_coord(Coord::new(4, 1)), false);
         assert_eq!(size.contains_coord(Coord::new(1, 3)), false);
+
+        let rect = size.rect();
+        assert_eq!(rect.min_coord, Coord::new(0, 0));
+        assert_eq!(rect.max_coord, Coord::new(2, 1));
     }
 
     #[test]
