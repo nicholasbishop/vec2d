@@ -31,6 +31,10 @@ impl Size {
         }
     }
 
+    pub fn area(&self) -> usize {
+        self.width * self.height
+    }
+
     /// Return true if the coordinate fits within self's width and
     /// height, false otherwise.
     pub fn contains_coord(&self, coord: Coord) -> bool {
@@ -54,16 +58,23 @@ impl Rect {
     }
 }
 
-pub struct GridMut<'a, Elem: 'a> {
-    elems: &'a mut [Elem],
+pub struct Vec2D<T> {
+    elems: Vec<T>,
     size: Size
 }
 
-impl<'a, Elem> GridMut<'a, Elem> {
-    pub fn new(elems: &'a mut [Elem], size: Size) -> Option<GridMut<Elem>> {
-        if size.width * size.height == elems.len() {
-            Some(GridMut {
-                elems: elems,
+impl<Elem: Copy> Vec2D<Elem> {
+    pub fn from_example(size: Size, example: &Elem) -> Vec2D<Elem> {
+        Vec2D {
+            elems: vec![*example; size.area()],
+            size: size
+        }
+    }
+
+    pub fn from_vec(size: Size, src: Vec<Elem>) -> Option<Vec2D<Elem>> {
+        if size.area() == src.len() {
+            Some(Vec2D {
+                elems: src,
                 size: size
             })
         }
@@ -72,7 +83,7 @@ impl<'a, Elem> GridMut<'a, Elem> {
         }
     }
 
-    pub fn rect_iter_mut(&'a mut self, rect: Rect) -> Option<RectIterMut<'a, Elem>> {
+    pub fn rect_iter_mut<'a>(&'a mut self, rect: Rect) -> Option<RectIterMut<'a, Elem>> {
         if self.size.contains_coord(rect.max_coord) {
             Some(RectIterMut {
                 stride: (self.size.width - rect.width()) as isize,
@@ -113,7 +124,7 @@ impl<'a, Elem> Iterator for RectIterMut<'a, Elem> {
 }
 
 pub struct RectIterMut<'a, Elem: 'a> {
-    grid: &'a mut GridMut<'a, Elem>,
+    grid: &'a mut Vec2D<Elem>,
     rect: Rect,
     cur_elem: *mut Elem,
     cur_coord: Coord,
@@ -122,8 +133,8 @@ pub struct RectIterMut<'a, Elem: 'a> {
 
 #[test]
 fn test_rect_iter_mut() {
-    let mut elems = [0, 1, 2, 3];
-    let mut grid = GridMut::new(&mut elems, Size::new(2, 2)).unwrap();
+    let mut elems = vec![0, 1, 2, 3];
+    let mut grid = Vec2D::from_vec(Size::new(2, 2), elems).unwrap();
     let rect = Rect::new(Coord::new(0, 0), Coord::new(1, 1)).unwrap();
 
     let mut actual_coords = Vec::new();
