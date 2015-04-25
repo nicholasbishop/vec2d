@@ -97,6 +97,13 @@ impl Rect {
     pub fn size(&self) -> Size {
         Size::new(self.width(), self.height())
     }
+
+    /// Return true if the coordinate is between `min_coord` and
+    /// `max_coord` (inclusive).
+    pub fn contains_coord(&self, coord: Coord) -> bool {
+        (coord.x >= self.min_coord.x && coord.x <= self.max_coord.x &&
+         coord.y >= self.min_coord.y && coord.y <= self.max_coord.y)
+    }
 }
 
 impl Size {
@@ -279,6 +286,9 @@ mod test {
 
         assert_eq!(rect.width(), rect.size().width);
         assert_eq!(rect.height(), rect.size().height);
+
+        assert_eq!(rect.contains_coord(Coord::new(0, 0)), false);
+        assert_eq!(rect.contains_coord(Coord::new(4, 3)), true);
     }
 
     #[test]
