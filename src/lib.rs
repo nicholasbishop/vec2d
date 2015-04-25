@@ -97,9 +97,9 @@ impl<Elem: Copy> Vec2D<Elem> {
     pub fn rect_iter_mut<'a>(&'a mut self, rect: Rect) -> Option<RectIterMut<'a, Elem>> {
         if self.size.contains_coord(rect.max_coord) {
             Some(RectIterMut {
+                grid: std::marker::PhantomData,
                 stride: (self.size.width - rect.width() + 1) as isize,
                 cur_elem: self.elems.as_mut_ptr(),
-                grid: self,
                 rect: rect,
                 cur_coord: rect.min_coord
             })
@@ -135,7 +135,8 @@ impl<'a, Elem> Iterator for RectIterMut<'a, Elem> {
 }
 
 pub struct RectIterMut<'a, Elem: 'a> {
-    grid: &'a mut Vec2D<Elem>,
+    grid: std::marker::PhantomData<&'a mut Vec2D<Elem>>,
+
     rect: Rect,
     cur_elem: *mut Elem,
     cur_coord: Coord,
