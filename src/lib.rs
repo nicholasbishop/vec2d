@@ -163,17 +163,22 @@ impl Rect {
 
 }
 
-#[test]
-fn test_rect_iter_mut() {
-    let elems = vec![1, 2, 3, 4];
-    let mut grid = Vec2D::from_vec(Size::new(2, 2), elems).unwrap();
-    let rect = Rect::new(Coord::new(0, 0), Coord::new(1, 1)).unwrap();
+#[cfg(test)]
+mod test {
+    use super::*;
 
-    let mut actual_coords = Vec::new();
-    for (coord, elem) in grid.rect_iter_mut(rect).unwrap() {
-        *elem = -(*elem);
-        actual_coords.push((coord.x, coord.y));
+    #[test]
+    fn test_rect_iter_mut() {
+        let elems = vec![1, 2, 3, 4];
+        let mut grid = Vec2D::from_vec(Size::new(2, 2), elems).unwrap();
+        let rect = Rect::new(Coord::new(0, 0), Coord::new(1, 1)).unwrap();
+
+        let mut actual_coords = Vec::new();
+        for (coord, elem) in grid.rect_iter_mut(rect).unwrap() {
+            *elem = -(*elem);
+            actual_coords.push((coord.x, coord.y));
+        }
+        assert_eq!(actual_coords, [(0, 0), (1, 0), (0, 1), (1, 1)]);
+        assert_eq!(grid.elems, [-1, -2, -3, -4]);
     }
-    assert_eq!(actual_coords, [(0, 0), (1, 0), (0, 1), (1, 1)]);
-    assert_eq!(grid.elems, [-1, -2, -3, -4]);
 }
