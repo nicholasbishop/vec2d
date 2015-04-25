@@ -226,6 +226,19 @@ mod test {
     }
 
     #[test]
+    fn test_size() {
+        let size = Size::new(3, 2);
+        assert_eq!(size.width, 3);
+        assert_eq!(size.height, 2);
+
+        assert_eq!(size.area(), 6);
+
+        assert_eq!(size.contains_coord(Coord::new(1, 1)), true);
+        assert_eq!(size.contains_coord(Coord::new(4, 1)), false);
+        assert_eq!(size.contains_coord(Coord::new(1, 3)), false);
+    }
+
+    #[test]
     fn test_rect_iter_mut() {
         let elems = vec![1, 2, 3, 4];
         let mut grid = Vec2D::from_vec(Size::new(2, 2), elems).unwrap();
