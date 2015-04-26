@@ -160,6 +160,11 @@ impl<Elem: Copy> Vec2D<Elem> {
         }
     }
 
+    /// Shortcut for self.size.rect()
+    pub fn rect(&self) -> Rect {
+        self.size.rect()
+    }
+
     fn stride(&self, rect: &Rect) -> isize {
         (self.size.width + 1 - rect.width()) as isize
     }
