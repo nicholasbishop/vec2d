@@ -170,6 +170,11 @@ impl<Elem: Copy> Vec2D<Elem> {
         (start.y * self.size.width + start.x) as isize
     }
 
+    /// Iterator over the entire Vec2D.
+    pub fn iter<'a>(&'a self) -> RectIter<'a, Elem> {
+        self.rect_iter(self.size.rect()).unwrap()
+    }
+
     /// Create an iterator over a rectangular region of the
     /// Vec2D. None is returned if the given `rect` does not fit
     /// entirely within the Vec2D.
@@ -197,6 +202,12 @@ impl<Elem: Copy> Vec2D<Elem> {
         else {
             None
         }
+    }
+
+    /// Mutable iterater over the entire Vec2D.
+    pub fn iter_mut<'a>(&'a mut self) -> RectIterMut<'a, Elem> {
+        let rect = self.size.rect();
+        self.rect_iter_mut(rect).unwrap()
     }
 
     /// Create a mutable iterator over a rectangular region of the
