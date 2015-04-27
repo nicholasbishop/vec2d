@@ -82,6 +82,15 @@ impl Coord {
     }
 }
 
+impl std::ops::Add for Coord {
+    type Output = Coord;
+
+    fn add(self, other: Coord) -> Coord {
+        Coord::new(self.x + other.x,
+                   self.y + other.y)
+    }
+}
+
 impl Rect {
     /// Calculate rectangle width
     pub fn width(&self) -> usize {
@@ -309,6 +318,13 @@ mod test {
         let coord = Coord::new(1, 2);
         assert_eq!(coord.x, 1);
         assert_eq!(coord.y, 2);
+    }
+
+    #[test]
+    fn test_coord_add() {
+        let a = Coord::new(1, 2);
+        let b = Coord::new(5, 9);
+        assert_eq!(a + b, Coord::new(6, 11));
     }
 
     #[test]
