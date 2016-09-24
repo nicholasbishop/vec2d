@@ -169,6 +169,58 @@ impl<Elem: Copy> Vec2D<Elem> {
         }
     }
 
+    /// Returns element at the given coord or `None` if the coord is 
+    /// outside the Vec2D
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # extern crate vec2d; use vec2d::*;
+    /// # fn main () {
+    /// let v = Vec2D::from_vec (
+    ///   Size { width: 3, height: 3 },
+    ///   vec!['a','b','c','d','e','f','g','h','i']
+    /// ).unwrap();
+    /// assert_eq!(v.get (Coord { x: 1, y: 0 }), Some(&'b'));
+    /// assert_eq!(v.get (Coord { x: 1, y: 2 }), Some(&'h'));
+    /// assert_eq!(v.get (Coord { x: 3, y: 0 }), None);
+    /// # }
+    /// ```
+    pub fn get(&self, coord: Coord) -> Option<&Elem> {
+        if self.size.contains_coord (coord) {
+            // column major coords
+            let i = coord.y*self.size.width + coord.x;
+            return Some(&self.elems[i])
+        }
+        None
+    }
+
+    /// Returns a mutable reference to the element at the given coord or
+    /// `None` if the coord is outside the Vec2D
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # extern crate vec2d; use vec2d::*;
+    /// # fn main () {
+    /// let mut v = Vec2D::from_vec (
+    ///   Size { width: 3, height: 3 },
+    ///   vec!['a','b','c','d','e','f','g','h','i']
+    /// ).unwrap();
+    /// assert_eq!(v.get_mut (Coord { x: 1, y: 0 }), Some(&mut 'b'));
+    /// assert_eq!(v.get_mut (Coord { x: 1, y: 2 }), Some(&mut 'h'));
+    /// assert_eq!(v.get_mut (Coord { x: 3, y: 0 }), None);
+    /// # }
+    /// ```
+    pub fn get_mut(&mut self, coord: Coord) -> Option<&mut Elem> {
+        if self.size.contains_coord (coord) {
+            // column major coords
+            let i = coord.y*self.size.width + coord.x;
+            return Some(&mut self.elems[i])
+        }
+        None
+    }
+
     /// Shortcut for self.size.rect()
     pub fn rect(&self) -> Rect {
         self.size.rect()
