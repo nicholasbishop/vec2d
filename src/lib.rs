@@ -180,6 +180,7 @@ impl<Elem: Copy> Vec2D<Elem> {
         self.size = new_size;
     }
 
+    /// Width and height
     pub fn size(&self) -> Size {
         self.size
     }
