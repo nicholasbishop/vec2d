@@ -226,6 +226,17 @@ impl<Elem: Copy> Vec2D<Elem> {
         self.size.rect()
     }
 
+    /// Resize in-place so that `size()` is equal to `new_size`
+    pub fn resize(&mut self, new_size: Size, value: Elem) {
+        self.elems.resize (new_size.area(), value);
+        self.size = new_size;
+    }
+
+    /// Width and height
+    pub fn size(&self) -> Size {
+        self.size
+    }
+
     fn stride(&self, rect: &Rect) -> isize {
         (self.size.width + 1 - rect.width()) as isize
     }
