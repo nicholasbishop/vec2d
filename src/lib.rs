@@ -291,13 +291,24 @@ impl<Elem: Copy> Vec2D<Elem> {
     /// Vec2D. None is returned if the given `rect` does not fit
     /// entirely within the Vec2D.
     pub fn rect_iter_mut<'a>(&'a mut self, rect: Rect) -> Option<RectIterMut<'a, Elem>> {
-        if self.size.contains_coord(rect.max_coord) {
+        self.rect_iter_mut_at(rect, rect.min_coord)
+    }
+
+    /// Create a mutable iterator over a rectangular region of the
+    /// Vec2D with the `start` coord. None is returned if the given
+    /// `rect` does not fit entirely within the Vec2D or if the
+    /// `start` coord is not within `rect`.
+    pub fn rect_iter_mut_at<'a>(&'a mut self, rect: Rect,
+                            start: Coord) -> Option<RectIterMut<'a, Elem>> {
+        if self.size.contains_coord(rect.max_coord) && rect.contains_coord(start) {
             Some(RectIterMut {
                 grid: std::marker::PhantomData,
                 stride: self.stride(&rect),
-                cur_elem: self.elems.as_mut_ptr(),
+                cur_elem: unsafe {
+                    self.elems.as_mut_ptr().offset(self.start_offset(start))
+                },
                 rect: rect,
-                cur_coord: rect.min_coord
+                cur_coord: start
             })
         }
         else {
