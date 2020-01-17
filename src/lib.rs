@@ -116,10 +116,7 @@ impl Rect {
 impl Size {
     /// Create a 2D size of (width, height)
     pub fn new(width: usize, height: usize) -> Size {
-        Size {
-            width,
-            height,
-        }
+        Size { width, height }
     }
 
     /// width * height
@@ -157,10 +154,7 @@ impl<Elem: Copy> Vec2D<Elem> {
     /// length of `src`.
     pub fn from_vec(size: Size, src: Vec<Elem>) -> Option<Vec2D<Elem>> {
         if size.area() == src.len() {
-            Some(Vec2D {
-                elems: src,
-                size,
-            })
+            Some(Vec2D { elems: src, size })
         } else {
             None
         }
@@ -291,11 +285,7 @@ impl<Elem: Copy> Vec2D<Elem> {
     /// Vec2D with the `start` coord. None is returned if the given
     /// `rect` does not fit entirely within the Vec2D or if the
     /// `start` coord is not within `rect`.
-    pub fn rect_iter_mut_at(
-        &mut self,
-        rect: Rect,
-        start: Coord,
-    ) -> Option<RectIterMut<Elem>> {
+    pub fn rect_iter_mut_at(&mut self, rect: Rect, start: Coord) -> Option<RectIterMut<Elem>> {
         if self.size.contains_coord(rect.max_coord) && rect.contains_coord(start) {
             Some(RectIterMut {
                 grid: std::marker::PhantomData,
