@@ -245,14 +245,14 @@ impl<Elem: Copy> Vec2D<Elem> {
     }
 
     /// Iterator over the entire Vec2D.
-    pub fn iter<'a>(&'a self) -> RectIter<'a, Elem> {
+    pub fn iter(&self) -> RectIter<Elem> {
         self.rect_iter(self.size.rect()).unwrap()
     }
 
     /// Create an iterator over a rectangular region of the
     /// Vec2D. None is returned if the given `rect` does not fit
     /// entirely within the Vec2D.
-    pub fn rect_iter<'a>(&'a self, rect: Rect) -> Option<RectIter<'a, Elem>> {
+    pub fn rect_iter(&self, rect: Rect) -> Option<RectIter<Elem>> {
         self.rect_iter_at(rect, rect.min_coord)
     }
 
@@ -260,7 +260,7 @@ impl<Elem: Copy> Vec2D<Elem> {
     /// the `start` coord. None is returned if the given `rect` does
     /// not fit entirely within the Vec2D or if the `start` coord is
     /// not within `rect`.
-    pub fn rect_iter_at<'a>(&'a self, rect: Rect, start: Coord) -> Option<RectIter<'a, Elem>> {
+    pub fn rect_iter_at(&self, rect: Rect, start: Coord) -> Option<RectIter<Elem>> {
         if self.size.contains_coord(rect.max_coord) && rect.contains_coord(start) {
             Some(RectIter {
                 grid: std::marker::PhantomData,
@@ -275,7 +275,7 @@ impl<Elem: Copy> Vec2D<Elem> {
     }
 
     /// Mutable iterater over the entire Vec2D.
-    pub fn iter_mut<'a>(&'a mut self) -> RectIterMut<'a, Elem> {
+    pub fn iter_mut(&mut self) -> RectIterMut<Elem> {
         let rect = self.size.rect();
         self.rect_iter_mut(rect).unwrap()
     }
@@ -283,7 +283,7 @@ impl<Elem: Copy> Vec2D<Elem> {
     /// Create a mutable iterator over a rectangular region of the
     /// Vec2D. None is returned if the given `rect` does not fit
     /// entirely within the Vec2D.
-    pub fn rect_iter_mut<'a>(&'a mut self, rect: Rect) -> Option<RectIterMut<'a, Elem>> {
+    pub fn rect_iter_mut(&mut self, rect: Rect) -> Option<RectIterMut<Elem>> {
         self.rect_iter_mut_at(rect, rect.min_coord)
     }
 
@@ -291,11 +291,11 @@ impl<Elem: Copy> Vec2D<Elem> {
     /// Vec2D with the `start` coord. None is returned if the given
     /// `rect` does not fit entirely within the Vec2D or if the
     /// `start` coord is not within `rect`.
-    pub fn rect_iter_mut_at<'a>(
-        &'a mut self,
+    pub fn rect_iter_mut_at(
+        &mut self,
         rect: Rect,
         start: Coord,
-    ) -> Option<RectIterMut<'a, Elem>> {
+    ) -> Option<RectIterMut<Elem>> {
         if self.size.contains_coord(rect.max_coord) && rect.contains_coord(start) {
             Some(RectIterMut {
                 grid: std::marker::PhantomData,
