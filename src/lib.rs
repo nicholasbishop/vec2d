@@ -75,7 +75,7 @@ pub struct RectIterMut<'a, Elem: 'a> {
 impl Coord {
     /// Create a coordinate at (x, y)
     pub fn new(x: usize, y: usize) -> Coord {
-        Coord { x: x, y: y }
+        Coord { x, y }
     }
 }
 
@@ -117,8 +117,8 @@ impl Size {
     /// Create a 2D size of (width, height)
     pub fn new(width: usize, height: usize) -> Size {
         Size {
-            width: width,
-            height: height,
+            width,
+            height,
         }
     }
 
@@ -148,7 +148,7 @@ impl<Elem: Copy> Vec2D<Elem> {
     pub fn from_example(size: Size, example: &Elem) -> Vec2D<Elem> {
         Vec2D {
             elems: vec![*example; size.area()],
-            size: size,
+            size,
         }
     }
 
@@ -159,7 +159,7 @@ impl<Elem: Copy> Vec2D<Elem> {
         if size.area() == src.len() {
             Some(Vec2D {
                 elems: src,
-                size: size,
+                size,
             })
         } else {
             None
@@ -266,7 +266,7 @@ impl<Elem: Copy> Vec2D<Elem> {
                 grid: std::marker::PhantomData,
                 stride: self.stride(&rect),
                 cur_elem: unsafe { self.elems.as_ptr().offset(self.start_offset(start)) },
-                rect: rect,
+                rect,
                 cur_coord: start,
             })
         } else {
@@ -301,7 +301,7 @@ impl<Elem: Copy> Vec2D<Elem> {
                 grid: std::marker::PhantomData,
                 stride: self.stride(&rect),
                 cur_elem: unsafe { self.elems.as_mut_ptr().offset(self.start_offset(start)) },
-                rect: rect,
+                rect,
                 cur_coord: start,
             })
         } else {
@@ -369,8 +369,8 @@ impl Rect {
     pub fn new(min_coord: Coord, max_coord: Coord) -> Option<Rect> {
         if min_coord.x <= max_coord.x && min_coord.y <= max_coord.y {
             Some(Rect {
-                min_coord: min_coord,
-                max_coord: max_coord,
+                min_coord,
+                max_coord,
             })
         } else {
             None
