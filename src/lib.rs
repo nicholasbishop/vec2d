@@ -16,8 +16,14 @@
 
 #![deny(missing_docs)]
 
+#[cfg(feature = "serde_support")]
+extern crate serde;
+#[cfg(feature = "serde_support")]
+use serde::{Deserialize, Serialize};
+
 /// 2D coordinate
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde_support", derive(Serialize, Deserialize))]
+#[derive(Clone, Copy, Debug, Hash, Eq, PartialEq)]
 pub struct Coord {
     /// X component
     pub x: usize,
@@ -27,7 +33,8 @@ pub struct Coord {
 }
 
 /// Rectangle defined by inclusive minimum and maximum coordinates
-#[derive(Clone, Copy, Eq, Debug, PartialEq)]
+#[cfg_attr(feature = "serde_support", derive(Serialize, Deserialize))]
+#[derive(Clone, Copy, Debug, Hash, Eq, PartialEq)]
 pub struct Rect {
     /// Minimum coordinate (inclusive)
     min_coord: Coord,
@@ -37,7 +44,8 @@ pub struct Rect {
 }
 
 /// Rectangle dimensions
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "serde_support", derive(Serialize, Deserialize))]
+#[derive(Clone, Copy, Debug, Hash, Eq, PartialEq)]
 pub struct Size {
     /// Width of rectangle
     pub width: usize,
@@ -46,7 +54,8 @@ pub struct Size {
 }
 
 /// Container for 2D data
-#[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde_support", derive(Serialize, Deserialize))]
+#[derive(Clone, Debug, Hash, Eq, PartialEq)]
 pub struct Vec2D<T> {
     elems: Vec<T>,
     size: Size,
@@ -375,6 +384,49 @@ impl Rect {
         } else {
             None
         }
+    }
+}
+
+#[cfg(test)]
+#[cfg(feature = "serde_support")]
+mod serde_derive_test {
+    use super::*;
+    use serde::de::DeserializeOwned;
+    use std::{cmp::PartialEq, fmt::Debug};
+
+    fn test_serde<T: Serialize + DeserializeOwned + Debug + PartialEq>(test_subject: &T) {
+        let serialized = serde_json::to_string(test_subject).unwrap();
+        let deserialized = serde_json::from_str::<T>(&serialized).unwrap();
+
+        assert_eq!(&deserialized, test_subject);
+    }
+
+    #[test]
+    fn test_coord_serde() {
+        let coord = Coord::new(5, 10);
+        test_serde(&coord);
+    }
+
+    #[test]
+    fn test_size_serde() {
+        let size = Size::new(5, 10);
+
+        test_serde(&size);
+    }
+
+    #[test]
+    fn test_rect_serde() {
+        let rect = Rect::new(Coord::new(0, 0), Coord::new(4, 2)).unwrap();
+
+        test_serde(&rect);
+    }
+
+    #[test]
+    fn test_vec2d_serde() {
+        let vec: Vec<i32> = (0..16).collect();
+        let vec2d = Vec2D::from_vec(Size::new(4, 4), vec).unwrap();
+
+        test_serde(&vec2d);
     }
 }
 
