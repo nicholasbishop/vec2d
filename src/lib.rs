@@ -75,7 +75,7 @@ pub struct RectIterMut<'a, Elem: 'a> {
 impl Coord {
     /// Create a coordinate at (x, y)
     pub fn new(x: usize, y: usize) -> Coord {
-        Coord { x: x, y: y }
+        Coord { x, y }
     }
 }
 
@@ -90,12 +90,12 @@ impl std::ops::Add for Coord {
 impl Rect {
     /// Calculate rectangle width
     pub fn width(&self) -> usize {
-        return self.max_coord.x - self.min_coord.x + 1;
+        self.max_coord.x - self.min_coord.x + 1
     }
 
     /// Calculate rectangle height
     pub fn height(&self) -> usize {
-        return self.max_coord.y - self.min_coord.y + 1;
+        self.max_coord.y - self.min_coord.y + 1
     }
 
     /// Calculate rectangle size
@@ -116,10 +116,7 @@ impl Rect {
 impl Size {
     /// Create a 2D size of (width, height)
     pub fn new(width: usize, height: usize) -> Size {
-        Size {
-            width: width,
-            height: height,
-        }
+        Size { width, height }
     }
 
     /// width * height
@@ -156,7 +153,7 @@ impl<Elem: Clone> Vec2D<Elem> {
     pub fn from_example(size: Size, example: &Elem) -> Vec2D<Elem> {
         Vec2D {
             elems: vec![example.clone(); size.area()],
-            size: size,
+            size,
         }
     }
 
@@ -173,10 +170,7 @@ impl<Elem> Vec2D<Elem> {
     /// length of `src`.
     pub fn from_vec(size: Size, src: Vec<Elem>) -> Option<Vec2D<Elem>> {
         if size.area() == src.len() {
-            Some(Vec2D {
-                elems: src,
-                size: size,
-            })
+            Some(Vec2D { elems: src, size })
         } else {
             None
         }
@@ -255,14 +249,14 @@ impl<Elem> Vec2D<Elem> {
     }
 
     /// Iterator over the entire Vec2D.
-    pub fn iter<'a>(&'a self) -> RectIter<'a, Elem> {
+    pub fn iter(&self) -> RectIter<Elem> {
         self.rect_iter(self.size.rect()).unwrap()
     }
 
     /// Create an iterator over a rectangular region of the
     /// Vec2D. None is returned if the given `rect` does not fit
     /// entirely within the Vec2D.
-    pub fn rect_iter<'a>(&'a self, rect: Rect) -> Option<RectIter<'a, Elem>> {
+    pub fn rect_iter(&self, rect: Rect) -> Option<RectIter<Elem>> {
         self.rect_iter_at(rect, rect.min_coord)
     }
 
@@ -270,13 +264,13 @@ impl<Elem> Vec2D<Elem> {
     /// the `start` coord. None is returned if the given `rect` does
     /// not fit entirely within the Vec2D or if the `start` coord is
     /// not within `rect`.
-    pub fn rect_iter_at<'a>(&'a self, rect: Rect, start: Coord) -> Option<RectIter<'a, Elem>> {
+    pub fn rect_iter_at(&self, rect: Rect, start: Coord) -> Option<RectIter<Elem>> {
         if self.size.contains_coord(rect.max_coord) && rect.contains_coord(start) {
             Some(RectIter {
                 grid: std::marker::PhantomData,
                 stride: self.stride(&rect),
                 cur_elem: unsafe { self.elems.as_ptr().offset(self.start_offset(start)) },
-                rect: rect,
+                rect,
                 cur_coord: start,
             })
         } else {
@@ -285,7 +279,7 @@ impl<Elem> Vec2D<Elem> {
     }
 
     /// Mutable iterater over the entire Vec2D.
-    pub fn iter_mut<'a>(&'a mut self) -> RectIterMut<'a, Elem> {
+    pub fn iter_mut(&mut self) -> RectIterMut<Elem> {
         let rect = self.size.rect();
         self.rect_iter_mut(rect).unwrap()
     }
@@ -293,7 +287,7 @@ impl<Elem> Vec2D<Elem> {
     /// Create a mutable iterator over a rectangular region of the
     /// Vec2D. None is returned if the given `rect` does not fit
     /// entirely within the Vec2D.
-    pub fn rect_iter_mut<'a>(&'a mut self, rect: Rect) -> Option<RectIterMut<'a, Elem>> {
+    pub fn rect_iter_mut(&mut self, rect: Rect) -> Option<RectIterMut<Elem>> {
         self.rect_iter_mut_at(rect, rect.min_coord)
     }
 
@@ -301,17 +295,13 @@ impl<Elem> Vec2D<Elem> {
     /// Vec2D with the `start` coord. None is returned if the given
     /// `rect` does not fit entirely within the Vec2D or if the
     /// `start` coord is not within `rect`.
-    pub fn rect_iter_mut_at<'a>(
-        &'a mut self,
-        rect: Rect,
-        start: Coord,
-    ) -> Option<RectIterMut<'a, Elem>> {
+    pub fn rect_iter_mut_at(&mut self, rect: Rect, start: Coord) -> Option<RectIterMut<Elem>> {
         if self.size.contains_coord(rect.max_coord) && rect.contains_coord(start) {
             Some(RectIterMut {
                 grid: std::marker::PhantomData,
                 stride: self.stride(&rect),
                 cur_elem: unsafe { self.elems.as_mut_ptr().offset(self.start_offset(start)) },
-                rect: rect,
+                rect,
                 cur_coord: start,
             })
         } else {
@@ -379,8 +369,8 @@ impl Rect {
     pub fn new(min_coord: Coord, max_coord: Coord) -> Option<Rect> {
         if min_coord.x <= max_coord.x && min_coord.y <= max_coord.y {
             Some(Rect {
-                min_coord: min_coord,
-                max_coord: max_coord,
+                min_coord,
+                max_coord,
             })
         } else {
             None
