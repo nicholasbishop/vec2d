@@ -139,16 +139,32 @@ impl Size {
     }
 }
 
-impl<Elem: Copy> Vec2D<Elem> {
+impl<Elem: Clone> Vec2D<Elem> {
     /// Create a Vec2D with the given `size`. All elements are
     /// initialized as copies of the `example` element.
+    ///
+    /// ```
+    /// # use vec2d::{Vec2D, Size};
+    /// let vector = Vec2D::from_example(Size::new(10, 10), &42);
+    /// for (_coord, &item) in vector.iter() {
+    ///     assert_eq!(item, 42);
+    /// }
+    /// ```
     pub fn from_example(size: Size, example: &Elem) -> Vec2D<Elem> {
         Vec2D {
-            elems: vec![*example; size.area()],
+            elems: vec![example.clone(); size.area()],
             size,
         }
     }
 
+    /// Resize in-place so that `size()` is equal to `new_size`
+    pub fn resize(&mut self, new_size: Size, value: Elem) {
+        self.elems.resize(new_size.area(), value);
+        self.size = new_size;
+    }
+}
+
+impl<Elem> Vec2D<Elem> {
     /// Create a Vec2D with the given `size`. The contents are set to
     /// `src`. None is returned if the `size` does not match the
     /// length of `src`.
@@ -215,12 +231,6 @@ impl<Elem: Copy> Vec2D<Elem> {
     /// Shortcut for self.size.rect()
     pub fn rect(&self) -> Rect {
         self.size.rect()
-    }
-
-    /// Resize in-place so that `size()` is equal to `new_size`
-    pub fn resize(&mut self, new_size: Size, value: Elem) {
-        self.elems.resize(new_size.area(), value);
-        self.size = new_size;
     }
 
     /// Width and height
