@@ -2,3 +2,12 @@
 [![Documentation](https://docs.rs/vec2d/badge.svg)](https://docs.rs/vec2d)
 
 Vec2D is a very simple 2D container for storing rectangular data
+
+### serde
+To enable support for the [serde](https://serde.rs/) library, enable the feature `serde_support`.
+
+Cargo.toml
+```
+[dependencies]
+vec2d={ version="x.x.x", features=["serde_support"] }
+```
