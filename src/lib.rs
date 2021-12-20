@@ -115,10 +115,10 @@ impl Rect {
     /// Return true if the coordinate is between `min_coord` and
     /// `max_coord` (inclusive).
     pub fn contains_coord(&self, coord: Coord) -> bool {
-        (coord.x >= self.min_coord.x
+        coord.x >= self.min_coord.x
             && coord.x <= self.max_coord.x
             && coord.y >= self.min_coord.y
-            && coord.y <= self.max_coord.y)
+            && coord.y <= self.max_coord.y
     }
 }
 
@@ -253,7 +253,7 @@ impl<Elem> Vec2D<Elem> {
 
     /// Calculate pointer offset for `start` element.
     fn start_offset(&self, start: Coord) -> isize {
-        debug_assert_eq!(self.size.contains_coord(start), true);
+        debug_assert!(self.size.contains_coord(start));
         (start.y * self.size.width + start.x) as isize
     }
 
